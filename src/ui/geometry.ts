@@ -123,3 +123,25 @@ export function fretMarkers(leftHanded = false): { x: number; y: number }[] {
   }
   return points;
 }
+
+/**
+ * Fatias de um círculo dividido em `n` partes iguais, como caminhos SVG (atributo `d`).
+ * Usado nas notas compartilhadas por várias âncoras. A primeira fatia começa no topo
+ * e elas seguem no sentido horário. Com n < 2 não há fatias (desenhe um círculo inteiro).
+ */
+export function pieSlicePaths(cx: number, cy: number, r: number, n: number): string[] {
+  if (n < 2) return [];
+  const paths: string[] = [];
+  const step = (2 * Math.PI) / n;
+  for (let i = 0; i < n; i++) {
+    const a0 = -Math.PI / 2 + i * step;
+    const a1 = a0 + step;
+    const x0 = cx + r * Math.cos(a0);
+    const y0 = cy + r * Math.sin(a0);
+    const x1 = cx + r * Math.cos(a1);
+    const y1 = cy + r * Math.sin(a1);
+    // Nenhuma fatia passa de meia volta quando n ≥ 2, então o arco é sempre o "pequeno" (0).
+    paths.push(`M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 0 1 ${x1} ${y1} Z`);
+  }
+  return paths;
+}

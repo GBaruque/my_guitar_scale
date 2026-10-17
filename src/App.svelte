@@ -7,12 +7,29 @@
   import ModeToggle from './ui/ModeToggle.svelte';
   import RootPicker from './ui/RootPicker.svelte';
   import ScaleGrid from './ui/ScaleGrid.svelte';
+  import SettingsDialog from './ui/SettingsDialog.svelte';
   import Tablature from './ui/Tablature.svelte';
+  import TuningsDialog from './ui/TuningsDialog.svelte';
+  import { TUNINGS } from './theory/tunings';
+  import { anchorColor } from './ui/anchorColors';
 
   // Aplica o tema no <html>, onde as variáveis de cor do app.css o leem.
   $effect(() => {
     document.documentElement.dataset.theme = app.theme;
   });
+
+  // Mantém a URL igual ao estado, para o link da barra de endereço ser compartilhável.
+  // replaceState (e não pushState) para não encher o histórico do "voltar" a cada clique.
+  $effect(() => {
+    history.replaceState(null, '', `?${app.query}`);
+  });
+
+  // Rótulos "Âncora N" na cor de cada âncora, só quando há mais de uma.
+  let tabLabels = $derived(
+    app.multiAnchor
+      ? app.anchors.map((fret, i) => ({ text: `Âncora ${i + 1} (casa ${fret})`, color: anchorColor(i) }))
+      : null,
+  );
 </script>
 
 <main>
@@ -23,12 +40,29 @@
     onToggleTheme={() => app.toggleTheme()}
   />
 
+  <div class="toolbar">
+    <SettingsDialog
+      leftHanded={app.leftHanded}
+      accidental={app.accidental}
+      onLeftHandedChange={(v) => app.setLeftHanded(v)}
+      onAccidentalChange={(v) => app.setAccidental(v)}
+    />
+    <TuningsDialog
+      tunings={TUNINGS}
+      current={app.tuning}
+      accidental={app.accidental}
+      onSelect={(id) => app.selectTuning(id)}
+    />
+  </div>
+
   <!-- Braço e linha de casas dividem a mesma largura, para os botões ficarem sobre as casas. -->
   <div class="board-scroll">
     <div class="board">
       <FretButtons
         mode={app.mode}
         anchors={app.anchors}
+        region={app.region}
+        multiAnchor={app.multiAnchor}
         leftHanded={app.leftHanded}
         onFretClick={(fret) => app.clickFret(fret)}
       />
@@ -37,6 +71,7 @@
         stringLabels={app.stringLabels}
         accidental={app.accidental}
         leftHanded={app.leftHanded}
+        multiAnchor={app.multiAnchor}
       />
     </div>
   </div>
@@ -44,7 +79,7 @@
   <ModeToggle mode={app.mode} onChange={(mode) => app.selectMode(mode)} />
 
   {#if app.mode !== 'full'}
-    <Tablature tabs={app.tabs} />
+    <Tablature tabs={app.tabs} labels={tabLabels} />
   {/if}
 
   <RootPicker root={app.root} accidental={app.accidental} onSelect={(pc) => app.selectRoot(pc)} />
@@ -60,6 +95,11 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
   .board-scroll {
     overflow-x: auto;

@@ -2,8 +2,9 @@
   // Só desenha. As células já chegam calculadas pelo estado (theory/); aqui só viram SVG.
   // As cores da madeira, trastes e marcações vêm de variáveis CSS do tema (app.css):
   // claro = rosewood com marcações prateadas, escuro = maple com marcações escuras.
-  import type { Cell } from '../theory/fretboard';
   import { FRET_COUNT } from '../theory/fretboard';
+  import type { AnchoredCell } from '../theory/shapes';
+  import { anchorColor } from './anchorColors';
   import { type Accidental, noteName } from '../theory/notes';
   import {
     BOARD_BOTTOM,
@@ -20,6 +21,7 @@
     NOTE_RADIUS,
     NUT_WIDTH,
     NUT_X,
+    pieSlicePaths,
     pointOf,
     stringThickness,
     stringY,
@@ -27,12 +29,14 @@
   } from './geometry';
 
   interface Props {
-    cells: Cell[];
+    cells: AnchoredCell[];
     stringLabels: string[];
     accidental: Accidental;
     leftHanded: boolean;
+    /** Vertical com 2+ âncoras: cada nota é pintada com a(s) cor(es) das âncoras a que pertence. */
+    multiAnchor: boolean;
   }
-  let { cells, stringLabels, accidental, leftHanded }: Props = $props();
+  let { cells, stringLabels, accidental, leftHanded, multiAnchor }: Props = $props();
 
   /** Sombra das cordas na madeira. Desligada em teste; para voltar, troque para true. */
   const SHOW_STRING_SHADOW = false;
@@ -103,10 +107,26 @@
 
   {#each cells as cell (`${cell.string}-${cell.fret}`)}
     {@const p = pointOf(cell, leftHanded)}
-    <g class="note" class:root={cell.isRoot}>
-      <circle cx={p.x} cy={p.y} r={NOTE_RADIUS} />
-      <text x={p.x} y={p.y}>{noteName(cell.pitchClass, accidental)}</text>
-    </g>
+    {#if multiAnchor}
+      <!-- Várias âncoras: uma cor por âncora; nota compartilhada vira círculo em fatias.
+           A tônica é marcada pela borda grossa e pelo rótulo em negrito. -->
+      <g class="anchored" class:root={cell.isRoot}>
+        {#if cell.belongsTo.length === 1}
+          <circle cx={p.x} cy={p.y} r={NOTE_RADIUS} style:fill={anchorColor(cell.belongsTo[0])} />
+        {:else}
+          {#each pieSlicePaths(p.x, p.y, NOTE_RADIUS, cell.belongsTo.length) as d, i (i)}
+            <path {d} style:fill={anchorColor(cell.belongsTo[i])} />
+          {/each}
+        {/if}
+        <circle class="ring" cx={p.x} cy={p.y} r={NOTE_RADIUS} />
+        <text x={p.x} y={p.y}>{noteName(cell.pitchClass, accidental)}</text>
+      </g>
+    {:else}
+      <g class="note" class:root={cell.isRoot}>
+        <circle cx={p.x} cy={p.y} r={NOTE_RADIUS} />
+        <text x={p.x} y={p.y}>{noteName(cell.pitchClass, accidental)}</text>
+      </g>
+    {/if}
   {/each}
 </svg>
 
@@ -187,6 +207,26 @@
   }
   .note.root text {
     fill: var(--root-note-text);
+    font-weight: 800;
+  }
+  .anchored .ring {
+    fill: none;
+    stroke: var(--anchor-ring);
+    stroke-width: 1;
+  }
+  .anchored.root .ring {
+    stroke: var(--anchor-root-ring);
+    stroke-width: 2.6;
+  }
+  /* Texto branco com contorno escuro: lê bem sobre qualquer cor da paleta e sobre as fatias. */
+  .anchored text {
+    fill: #fff;
+    stroke: rgba(0, 0, 0, 0.55);
+    stroke-width: 2.2px;
+    paint-order: stroke;
+    font-weight: 500;
+  }
+  .anchored.root text {
     font-weight: 800;
   }
 </style>

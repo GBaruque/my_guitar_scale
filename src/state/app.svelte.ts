@@ -2,21 +2,30 @@
 // os campos com $derived são recalculados automaticamente pelas funções de theory/
 // sempre que algo de que dependem muda (parecido com uma @property em Python, mas com cache).
 
-import { type Cell, fullFretboard } from '../theory/fretboard';
+import { fullFretboard } from '../theory/fretboard';
+import type { FretRegion } from '../theory/fingering/types';
 import { type Accidental, noteName, type PitchClass } from '../theory/notes';
 import {
-  DEFAULT_SCALE_ID,
   findScale,
   SCALES,
   type ScaleCategory,
   scaleNotes,
   scalesInCategory,
 } from '../theory/scales';
-import { buildVertical, MAX_ANCHOR, type Shape } from '../theory/shapes';
+import { selectRegionFret } from '../theory/region';
+import {
+  type AnchoredCell,
+  buildDiagonal,
+  buildVertical,
+  composeShapes,
+  type Shape,
+  toggleAnchor,
+} from '../theory/shapes';
 import { renderTab, upAndDown } from '../theory/tab';
-import { DEFAULT_TUNING_ID, findTuning, TUNINGS, tuningNoteNames } from '../theory/tunings';
+import { findTuning, TUNINGS, tuningNoteNames } from '../theory/tunings';
+import { fromQuery, type Mode, toQuery, type UrlState } from './url';
 
-export type Mode = 'full' | 'vertical' | 'diagonal';
+export type { Mode };
 export type Theme = 'light' | 'dark';
 
 /** Chave do tema no localStorage. O mesmo nome é lido pelo script em index.html. */
@@ -33,17 +42,22 @@ function initialTheme(): Theme {
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+// O estado inicial vem da URL (link compartilhado); o que faltar ou for inválido usa o padrão.
+const initial = fromQuery(window.location.search);
+
 class AppState {
-  root = $state<PitchClass>(0);
-  scaleId = $state(DEFAULT_SCALE_ID);
-  /** Aba de categoria visível. Pode ser diferente da categoria da escala selecionada. */
-  category = $state<ScaleCategory>('common');
-  mode = $state<Mode>('full');
-  /** Sempre uma lista (mínimo 1), já pensando em múltiplas âncoras (marco 6). */
-  anchors = $state<number[]>([0]);
-  tuningId = $state(DEFAULT_TUNING_ID);
-  accidental = $state<Accidental>('sharp');
-  leftHanded = $state(false);
+  root = $state<PitchClass>(initial.root);
+  scaleId = $state(initial.scaleId);
+  /** Aba de categoria visível. Começa na categoria da escala; depois o usuário troca à vontade. */
+  category = $state<ScaleCategory>(findScale(initial.scaleId)?.category ?? 'common');
+  mode = $state<Mode>(initial.mode);
+  /** Âncoras do Vertical: ordenadas, sem repetição, no mínimo uma. */
+  anchors = $state<number[]>(initial.anchors);
+  /** Região do Diagonal. */
+  region = $state<FretRegion>(initial.region);
+  tuningId = $state(initial.tuningId);
+  accidental = $state<Accidental>(initial.accidental);
+  leftHanded = $state(initial.leftHanded);
   /** Preferência pessoal: fica no localStorage, não na URL. */
   theme = $state<Theme>(initialTheme());
 
@@ -55,16 +69,40 @@ class AppState {
   stringLabels = $derived(tuningNoteNames(this.tuning, this.accidental));
   visibleScales = $derived(scalesInCategory(this.category));
 
-  /** Uma forma por âncora (no marco 5 só há uma). */
-  shapes = $derived<Shape[]>(
-    this.anchors.map((anchor) => buildVertical(anchor, this.notes, this.tuning)),
-  );
+  /** Formas do modo atual: uma por âncora no Vertical, uma só no Diagonal, nenhuma no Full. */
+  shapes = $derived.by<Shape[]>(() => {
+    if (this.mode === 'vertical') {
+      return this.anchors.map((anchor) => buildVertical(anchor, this.notes, this.tuning));
+    }
+    if (this.mode === 'diagonal') return [buildDiagonal(this.region, this.notes, this.tuning)];
+    return [];
+  });
+
+  /** Com 2 ou mais âncoras cada uma ganha sua cor; com 1, o visual é o normal. */
+  multiAnchor = $derived(this.mode === 'vertical' && this.anchors.length > 1);
 
   /** O que o braço desenha no modo atual. */
-  cells = $derived<Cell[]>(
-    this.mode === 'full' ? fullFretboard(this.tuning, this.notes) : this.shapes.flatMap((s) => s.cells),
+  cells = $derived<AnchoredCell[]>(
+    this.mode === 'full'
+      ? fullFretboard(this.tuning, this.notes).map((cell) => ({ ...cell, belongsTo: [] }))
+      : composeShapes(this.shapes),
   );
 
+  /** Query string que representa o estado atual (o App a grava na barra de endereço). */
+  query = $derived(
+    toQuery({
+      root: this.root,
+      scaleId: this.scaleId,
+      mode: this.mode,
+      anchors: this.anchors,
+      region: this.region,
+      tuningId: this.tuningId,
+      leftHanded: this.leftHanded,
+      accidental: this.accidental,
+    } satisfies UrlState),
+  );
+
+  /** Uma tablatura por forma (linhas de texto, 1ª corda no topo). */
   tabs = $derived(this.shapes.map((s) => renderTab(upAndDown(s.sequence), this.stringLabels)));
 
   selectRoot(root: PitchClass) {
@@ -83,6 +121,18 @@ class AppState {
     this.mode = mode;
   }
 
+  selectTuning(id: string) {
+    if (findTuning(id)) this.tuningId = id;
+  }
+
+  setLeftHanded(leftHanded: boolean) {
+    this.leftHanded = leftHanded;
+  }
+
+  setAccidental(accidental: Accidental) {
+    this.accidental = accidental;
+  }
+
   toggleTheme() {
     this.theme = this.theme === 'dark' ? 'light' : 'dark';
     try {
@@ -92,11 +142,10 @@ class AppState {
     }
   }
 
-  /** Marco 5: clicar numa casa troca a âncora. No marco 6 vira "alternar". */
+  /** Clique num botão de casa: alterna a âncora (Vertical) ou ajusta a região (Diagonal). */
   clickFret(fret: number) {
-    if (this.mode === 'vertical' && fret >= 0 && fret <= MAX_ANCHOR) {
-      this.anchors = [fret];
-    }
+    if (this.mode === 'vertical') this.anchors = toggleAnchor(this.anchors, fret);
+    else if (this.mode === 'diagonal') this.region = selectRegionFret(this.region, fret);
   }
 }
 

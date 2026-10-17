@@ -39,9 +39,18 @@
   --root-note: #f2a444;
   --root-note-border: #9a5a10;
   --root-note-text: #2a1600;
+  /* Borda das notas com várias âncoras; a da tônica é grossa. */
+  --anchor-ring: rgba(0, 0, 0, 0.45);
+  --anchor-root-ring: #ffffff;
   --root: #f08a0c;
   --root-border: #8a4b00;
   --note-ink: #1d1d1d;
+
+  /* Botões da região do Diagonal: pontas em azul-escuro, o meio em azul-claro. */
+  --region-edge: #1f4e8c;
+  --region-edge-text: #ffffff;
+  --region-inside: #bcd5f2;
+  --region-inside-text: #14304f;
 
   --mono: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
 
@@ -77,6 +86,13 @@
   --root-note: #b9472f;
   --root-note-border: #6e2414;
   --root-note-text: #ffffff;
+  --anchor-ring: rgba(0, 0, 0, 0.55);
+  --anchor-root-ring: #1d1d1d;
+
+  --region-edge: #3d7bd0;
+  --region-edge-text: #ffffff;
+  --region-inside: #233c5c;
+  --region-inside-text: #d8e6f7;
 }
 
 body {
@@ -92,6 +108,24 @@ button {
   background: var(--button);
   color: var(--ink);
   cursor: pointer;
+}
+
+dialog {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  max-width: min(46rem, calc(100vw - 2rem));
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+dialog h2 {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
 }
 
 button:disabled {

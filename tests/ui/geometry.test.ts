@@ -8,6 +8,7 @@ import {
   horizontalSpan,
   NOTE_RADIUS,
   NUT_X,
+  pieSlicePaths,
   pointOf,
   SCALE_LENGTH,
   stringThickness,
@@ -59,5 +60,19 @@ describe('geometria do braço', () => {
 
   it('marcações: 8 simples + 2 duplas', () => {
     expect(fretMarkers()).toHaveLength(12);
+  });
+});
+
+describe('pieSlicePaths', () => {
+  it('uma fatia por âncora; nenhuma com uma só', () => {
+    expect(pieSlicePaths(0, 0, 10, 1)).toEqual([]);
+    expect(pieSlicePaths(0, 0, 10, 3)).toHaveLength(3);
+  });
+
+  it('duas fatias: metade de cima até embaixo pela direita, e de volta pela esquerda', () => {
+    const [right, left] = pieSlicePaths(0, 0, 10, 2);
+    // Começa no topo (0, -10) e termina embaixo (0, 10).
+    expect(right).toMatch(/^M 0 0 L [-\de.]+ -10 A 10 10 0 0 1 [-\de.]+ 10 Z$/);
+    expect(left).toMatch(/L [-\de.]+ 10 A/);
   });
 });

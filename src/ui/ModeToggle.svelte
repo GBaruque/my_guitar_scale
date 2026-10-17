@@ -7,10 +7,10 @@
   }
   let { mode, onChange }: Props = $props();
 
-  const modes: { id: Mode; label: string; enabled: boolean }[] = [
-    { id: 'full', label: 'Full', enabled: true },
-    { id: 'vertical', label: 'Vertical', enabled: true },
-    { id: 'diagonal', label: 'Diagonal', enabled: false }, // marco 7
+  const modes: { id: Mode; label: string }[] = [
+    { id: 'full', label: 'Full' },
+    { id: 'vertical', label: 'Vertical' },
+    { id: 'diagonal', label: 'Diagonal' },
   ];
 </script>
 
@@ -19,8 +19,6 @@
     <button
       class:active={mode === m.id}
       aria-pressed={mode === m.id}
-      disabled={!m.enabled}
-      title={m.enabled ? '' : 'Em breve'}
       onclick={() => onChange(m.id)}>{m.label}</button
     >
   {/each}

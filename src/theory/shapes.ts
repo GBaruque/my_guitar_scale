@@ -43,6 +43,16 @@ export function buildShape(
   return { region, sequence, cells };
 }
 
+/** Diagonal: a mesma estratégia, só que com uma região larga. */
+export function buildDiagonal(
+  region: FretRegion,
+  notes: ScaleNote[],
+  tuning: Tuning,
+  strategy: FingeringStrategy = windowStrategy,
+): Shape {
+  return buildShape(strategy, notes, tuning, region);
+}
+
 export function buildVertical(
   anchor: number,
   notes: ScaleNote[],
@@ -52,3 +62,42 @@ export function buildVertical(
   return buildShape(strategy, notes, tuning, verticalRegion(anchor));
 }
 
+// ---------------------------------------------------------------------------
+// Múltiplas âncoras
+// ---------------------------------------------------------------------------
+
+/** Uma célula do braço junto com as formas (índices em `anchors`) que a incluem. */
+export interface AnchoredCell extends Cell {
+  /** Vazio no modo Full; no Vertical, as âncoras cuja forma passa por esta posição. */
+  belongsTo: number[];
+}
+
+/**
+ * Junta várias formas numa lista só de células. Uma posição que aparece em mais de uma
+ * forma vira uma célula só, com todos os índices em `belongsTo` (desenhada em fatias).
+ * Ordenada por corda e depois por casa.
+ */
+export function composeShapes(shapes: Shape[]): AnchoredCell[] {
+  const byPosition = new Map<string, AnchoredCell>();
+  shapes.forEach((shape, index) => {
+    for (const cell of shape.cells) {
+      const key = `${cell.string}:${cell.fret}`;
+      const existing = byPosition.get(key);
+      if (existing) existing.belongsTo.push(index);
+      else byPosition.set(key, { ...cell, belongsTo: [index] });
+    }
+  });
+  return [...byPosition.values()].sort((a, b) => a.string - b.string || a.fret - b.fret);
+}
+
+/**
+ * Clique num botão de casa no Vertical: adiciona a âncora se não existe, remove se existe.
+ * A lista fica sempre ordenada e sem repetição, e nunca fica vazia (a última não sai).
+ */
+export function toggleAnchor(anchors: number[], fret: number): number[] {
+  if (!Number.isInteger(fret) || fret < 0 || fret > MAX_ANCHOR) return anchors;
+  if (anchors.includes(fret)) {
+    return anchors.length === 1 ? anchors : anchors.filter((a) => a !== fret);
+  }
+  return [...anchors, fret].sort((a, b) => a - b);
+}

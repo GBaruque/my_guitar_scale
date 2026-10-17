@@ -170,9 +170,11 @@ Todas as posições `(corda, casa)` com casa 0–24 cuja nota pertence à escala
 
 ### Diagonal (região início → fim)
 - Região `[início, fim]` com `fim − início ≥ MIN_DIAGONAL_SPAN` (= 10).
-- **Seleção por clique** (`theory/region.ts`), com `MID = FRET_COUNT / 2` (= 12):
-  - Clique na casa `f ≤ MID` → `início = f`. Se `fim − início < 10`, então `fim = início + 10`.
-  - Clique na casa `f > MID` → `fim = f`. Se `fim − início < 10`, então `início = fim − 10`.
+- **Seleção por clique** (`theory/region.ts`): o clique move a **ponta mais próxima** da casa clicada
+  (fora da região, estica para o lado do clique; dentro, encolhe pelo lado mais perto).
+  - Empate: casa `f ≤ MID` (`MID = FRET_COUNT / 2` = 12) move o início; `f > MID` move o fim.
+  - Se `fim − início < 10`, a outra ponta é empurrada. Se nem assim couber no braço, a ponta clicada
+    para no limite (fim mínimo 10, início máximo 14).
 - Botões: início e fim em azul-escuro, casas entre eles em azul-claro, demais em cinza.
 - Região padrão: 0–12.
 - **Não copiamos o algoritmo do site** (ele não segue uma regra simples identificável). Usamos a nossa
@@ -306,3 +308,10 @@ Sincronizado com a query string para links compartilháveis, por exemplo:
   a sequência (sem isso, Drop D na âncora 20 mostrava só 3 notas).
 - Geometria do desenho (`(corda, casa) → (x, y)`) fica em `src/ui/geometry.ts`: é pura e testada,
   mas não é teoria musical.
+- Tema claro (rosewood) / escuro (maple) é preferência pessoal: fica no `localStorage`, não na URL.
+- Cores das âncoras seguem a posição na lista ordenada (`anchors[i]` → `ANCHOR_COLORS[i]`), então
+  adicionar uma âncora mais grave desloca as cores das demais. A paleta fica em `src/ui/anchorColors.ts`.
+- URL inclui também `region` (ex.: `region=0-12`), `hand` (`left`/`right`) e `acc` (`sharp`/`flat`).
+  A categoria visível não vai na URL: ao abrir um link, ela começa na categoria da escala.
+- Seleção do Diagonal pela ponta mais próxima, em vez de "≤ 12 move o início". A regra original
+  impedia escolher, por exemplo, 0–10 (clicar no 10 movia o início) ou um início depois da casa 12.
