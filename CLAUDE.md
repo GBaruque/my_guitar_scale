@@ -215,7 +215,9 @@ no futuro, sem mexer em braço, tablatura ou âncoras.
    - Se cabe na **corda seguinte** dentro de `[L[k+1], U[k+1]]` → muda de corda.
    - Senão, se cabe na **corda atual** dentro de `[L[k], U[k]]` → fica.
    - Senão, procura a primeira corda acima de k+1 onde caiba (salvaguarda; não deve ocorrer).
-   - Se não couber em lugar nenhum → fim da sequência.
+   - Se não couber em lugar nenhum → fim da sequência. **Exceção:** se ainda houver notas mais agudas
+     alcançáveis na janela, a nota é pulada. Isso só ocorre quando algum `U[k]` foi cortado na casa 24
+     (afinações com intervalo maior que uma quarta entre cordas, âncoras 18–20).
 3. Cada altura aparece uma vez só.
 
 ### Tablatura (`theory/tab.ts`)
@@ -300,3 +302,7 @@ Sincronizado com a query string para links compartilháveis, por exemplo:
 - Braço com 24 casas (o site tem 21). Âncoras 0–20.
 - Algoritmo do Diagonal próprio (janela deslizante), unificado com o Vertical. O do site não foi copiado.
 - Afinações Drop A e Drop B corrigidas em relação ao site.
+- Janela deslizante: notas inalcançáveis por causa do corte na casa 24 são puladas em vez de encerrar
+  a sequência (sem isso, Drop D na âncora 20 mostrava só 3 notas).
+- Geometria do desenho (`(corda, casa) → (x, y)`) fica em `src/ui/geometry.ts`: é pura e testada,
+  mas não é teoria musical.

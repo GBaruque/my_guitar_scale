@@ -1,20 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { cellAt, FRET_COUNT, fullFretboard, midiAt, type Cell } from '../../src/theory/fretboard';
-import { findScale, scaleNotes, type Scale } from '../../src/theory/scales';
-import { findTuning, type Tuning } from '../../src/theory/tunings';
-
-function scale(id: string): Scale {
-  const found = findScale(id);
-  if (!found) throw new Error(`escala ${id} não encontrada`);
-  return found;
-}
-
-function tuning(id: string): Tuning {
-  const found = findTuning(id);
-  if (!found) throw new Error(`afinação ${id} não encontrada`);
-  return found;
-}
-
+import { scaleNotes } from '../../src/theory/scales';
+import { scale, tuning } from '../helpers';
 /** Casas que aparecem numa corda, para comparar com tabelas legíveis. */
 function fretsOn(cells: Cell[], string: number): number[] {
   return cells.filter((c) => c.string === string).map((c) => c.fret);

@@ -1,0 +1,107 @@
+/*
+ * Cores do app em variáveis, uma paleta por tema. O tema vem do atributo data-theme no <html>
+ * (posto pelo estado do app e, antes dele carregar, pelo script em index.html para não piscar).
+ *
+ * Claro: braço de rosewood (escuro). Escuro: braço de maple (bege).
+ * Marcações prateadas nos dois temas.
+ * Cores das notas: as duas madeiras são quentes (marrom e bege), então as notas usam um verde-azulado
+ * (tom frio, contrasta com a madeira) e a tônica um tom quente e mais saturado (contrasta com as notas).
+ *   rosewood: notas verde-água claro, tônica âmbar (claras sobre madeira escura);
+ *   maple: notas verde-petróleo, tônica terracota (escuras sobre madeira clara).
+ * Os botões ativos continuam em laranja (--root).
+ */
+:root {
+  color-scheme: light;
+
+  --bg: #f7f5f1;
+  --ink: #222;
+  --muted: #666;
+  --button: #ebe8e3;
+  --border: #c9c4bc;
+  --window: #fde9b8;
+
+  --wood-edge: #24170f;
+  --wood-center: #46301f;
+  /* Marcações prateadas nos dois temas; a borda ajuda a aparecerem sobre o maple. */
+  --inlay: #d6d6d6;
+  --inlay-border: #8e8e8e;
+  --fret-edge: #6e6e6e;
+  --fret-shine: #e9e9e9;
+  --nut: #efe8d6;
+  --nut-border: #b9b09a;
+  --string-edge: #6f6f6f;
+  --string-shine: #fbfbfb;
+
+  /* Notas do braço (rosewood). Testadas antes: amarelo/laranja, azul, rosa/branco. */
+  --note: #a8d8cc;
+  --note-border: #4c8a7d;
+  --note-text: #10302a;
+  --root-note: #f2a444;
+  --root-note-border: #9a5a10;
+  --root-note-text: #2a1600;
+  --root: #f08a0c;
+  --root-border: #8a4b00;
+  --note-ink: #1d1d1d;
+
+  --mono: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #18181a;
+  --ink: #ebe7e0;
+  --muted: #9b968e;
+  --button: #2b2a28;
+  --border: #48443f;
+  --window: #4b3b16;
+
+  --wood-edge: #c49c5f;
+  --wood-center: #ecd3a0;
+  /* Sobre maple, o traste aparece cinza-escuro. */
+  --fret-edge: #3a3a3a;
+  --fret-shine: #9a9a9a;
+  --nut: #f4eee0;
+  --nut-border: #8f8670;
+  --string-edge: #5c5c5c;
+  --string-shine: #f2f2f2;
+
+  /* Notas do braço (maple). */
+  --note: #2f6e69;
+  --note-border: #1b4541;
+  --note-text: #ffffff;
+  --root-note: #b9472f;
+  --root-note-border: #6e2414;
+  --root-note-text: #ffffff;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+button {
+  font: inherit;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--button);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.active {
+  background: var(--root);
+  border-color: var(--root-border);
+  color: var(--note-ink);
+  font-weight: 600;
+}
