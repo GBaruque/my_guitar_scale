@@ -1,0 +1,68 @@
+# Publica o app no GitHub Pages a cada push no main.
+# Endereço: https://gbaruque.github.io/my_guitar_scale/
+#
+# São dois "jobs" em sequência:
+#   build:  instala, testa, compila e empacota a pasta dist/
+#   deploy: publica o pacote no Pages (só roda se o build passou)
+# Se algum teste falhar, nada é publicado e o site continua na versão anterior.
+
+name: Deploy no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Permite rodar na mão pela aba Actions (botão "Run workflow").
+  workflow_dispatch:
+
+# Permissões mínimas: ler o código e publicar no Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Se dois pushes chegarem juntos, o deploy mais novo espera o anterior terminar.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # npm ci instala exatamente as versões do package-lock.json.
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Testes
+        run: npm test
+
+      - name: Checagem de tipos
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Empacotar o site (pasta dist/)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
