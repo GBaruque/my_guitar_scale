@@ -3,6 +3,7 @@ import {
   allPitchClasses,
   intervalUp,
   isNatural,
+  midiToFrequency,
   mod,
   noteName,
   parseNoteName,
@@ -16,6 +17,18 @@ describe('mod', () => {
     expect(mod(-13, 12)).toBe(11);
     expect(mod(25, 12)).toBe(1);
     expect(mod(0, 12)).toBe(0);
+  });
+});
+
+describe('midiToFrequency', () => {
+  it('A4 = 440 Hz e cada oitava dobra', () => {
+    expect(midiToFrequency(69)).toBe(440);
+    expect(midiToFrequency(57)).toBeCloseTo(220);
+    expect(midiToFrequency(81)).toBeCloseTo(880);
+  });
+
+  it('E grave da guitarra (E2) ≈ 82,41 Hz', () => {
+    expect(midiToFrequency(40)).toBeCloseTo(82.41, 2);
   });
 });
 

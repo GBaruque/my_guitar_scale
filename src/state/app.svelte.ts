@@ -2,7 +2,8 @@
 // os campos com $derived são recalculados automaticamente pelas funções de theory/
 // sempre que algo de que dependem muda (parecido com uma @property em Python, mas com cache).
 
-import { fullFretboard } from '../theory/fretboard';
+import { type PlaybackHandle, playPhrases } from '../audio/player';
+import { fullFretboard, type Position } from '../theory/fretboard';
 import type { FretRegion } from '../theory/fingering/types';
 import { type Accidental, noteName, type PitchClass } from '../theory/notes';
 import {
@@ -12,6 +13,7 @@ import {
   scaleNotes,
   scalesInCategory,
 } from '../theory/scales';
+import { type Phrase, scaleRunPhrase, shapePhrases } from '../theory/playback';
 import { selectRegionFret } from '../theory/region';
 import {
   type AnchoredCell,
@@ -61,6 +63,12 @@ class AppState {
   /** Preferência pessoal: fica no localStorage, não na URL. */
   theme = $state<Theme>(initialTheme());
 
+  /** Som tocando agora, e a posição da nota que está soando (destacada no braço). */
+  playing = $state(false);
+  nowPlaying = $state<Position | null>(null);
+  /** Controle da reprodução em andamento. Não é $state: a tela não depende dele. */
+  private playback: PlaybackHandle | null = null;
+
   scale = $derived(findScale(this.scaleId) ?? SCALES[0]);
   tuning = $derived(findTuning(this.tuningId) ?? TUNINGS[0]);
   notes = $derived(scaleNotes(this.root, this.scale));
@@ -108,6 +116,16 @@ class AppState {
     } satisfies UrlState),
   );
 
+  /** O que o botão de som toca: as sequências desenhadas, ou a escala numa oitava no Full. */
+  phrases = $derived<Phrase[]>(
+    this.mode === 'full'
+      ? [scaleRunPhrase(this.notes, this.tuning)]
+      : shapePhrases(
+          this.shapes.map((s) => s.sequence),
+          this.tuning,
+        ),
+  );
+
   /** Uma tablatura por forma (linhas de texto, 1ª corda no topo). */
   tabs = $derived(this.shapes.map((s) => renderTab(upAndDown(s.sequence), this.stringLabels)));
 
@@ -137,6 +155,25 @@ class AppState {
 
   setAccidental(accidental: Accidental) {
     this.accidental = accidental;
+  }
+
+  togglePlayback() {
+    if (this.playing) {
+      this.stopPlayback();
+      return;
+    }
+    this.playing = true;
+    this.playback = playPhrases(this.phrases, (step) => {
+      this.nowPlaying = step?.position ?? null;
+      if (step === null) {
+        this.playing = false;
+        this.playback = null;
+      }
+    });
+  }
+
+  stopPlayback() {
+    this.playback?.stop();
   }
 
   toggleTheme() {

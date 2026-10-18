@@ -51,6 +51,8 @@
   /* Borda das notas com várias âncoras; a da tônica é grossa. */
   --anchor-ring: rgba(0, 0, 0, 0.45);
   --anchor-root-ring: #ffffff;
+  /* Anel em volta da nota que está soando. */
+  --playing: #ffffff;
   --root: #f08a0c;
   --root-border: #8a4b00;
   --note-ink: #1d1d1d;
@@ -104,6 +106,7 @@
   --root-note-text: #ffffff;
   --anchor-ring: rgba(0, 0, 0, 0.55);
   --anchor-root-ring: #1d1d1d;
+  --playing: #1d1d1d;
 
   --region-edge: #3d7bd0;
   --region-edge-text: #ffffff;

@@ -31,6 +31,18 @@ export function mod(n: number, m: number): number {
   return ((n % m) + m) % m;
 }
 
+/** Referência de afinação: o Lá central (A4, MIDI 69) vibra a 440 Hz. */
+export const A4_MIDI = 69;
+export const A4_FREQUENCY = 440;
+
+/**
+ * Frequência em Hz de uma nota MIDI. Cada semitom multiplica a frequência por 2^(1/12)
+ * (temperamento igual), então uma oitava (12 semitons) dobra a frequência.
+ */
+export function midiToFrequency(midi: Midi): number {
+  return A4_FREQUENCY * 2 ** ((midi - A4_MIDI) / SEMITONES_PER_OCTAVE);
+}
+
 /** Classe de altura de uma nota MIDI (descarta a oitava). */
 export function pitchClassOf(midi: Midi): PitchClass {
   return mod(midi, SEMITONES_PER_OCTAVE);

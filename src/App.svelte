@@ -18,6 +18,12 @@
     document.documentElement.dataset.theme = app.theme;
   });
 
+  // Mudou escala, tônica, modo, âncoras...? Para o som: ele estava tocando a forma antiga.
+  $effect(() => {
+    void app.query; // dependência: qualquer mudança do estado que vai para a URL
+    app.stopPlayback();
+  });
+
   // Mantém a URL igual ao estado, para o link da barra de endereço ser compartilhável.
   // replaceState (e não pushState) para não encher o histórico do "voltar" a cada clique.
   $effect(() => {
@@ -38,6 +44,8 @@
     formula={app.scale.formula}
     theme={app.theme}
     onToggleTheme={() => app.toggleTheme()}
+    playing={app.playing}
+    onTogglePlay={() => app.togglePlayback()}
   />
 
   <div class="toolbar">
@@ -54,6 +62,13 @@
       onSelect={(id) => app.selectTuning(id)}
     />
   </div>
+
+  <!-- A tônica fica logo acima do braço: é o controle mais trocado durante o estudo
+       e ocupa só uma fileira. -->
+  <section class="panel" aria-labelledby="root-title">
+    <h2 id="root-title" class="panel-title">Tônica</h2>
+    <RootPicker root={app.root} accidental={app.accidental} onSelect={(pc) => app.selectRoot(pc)} />
+  </section>
 
   <!-- Braço e linha de casas dividem a mesma largura, para os botões ficarem sobre as casas. -->
   <div class="board-scroll">
@@ -72,6 +87,7 @@
         accidental={app.accidental}
         leftHanded={app.leftHanded}
         multiAnchor={app.multiAnchor}
+        highlight={app.nowPlaying}
       />
     </div>
   </div>
@@ -81,11 +97,6 @@
   {#if app.mode !== 'full'}
     <Tablature tabs={app.tabs} labels={tabLabels} />
   {/if}
-
-  <section class="panel" aria-labelledby="root-title">
-    <h2 id="root-title" class="panel-title">Tônica</h2>
-    <RootPicker root={app.root} accidental={app.accidental} onSelect={(pc) => app.selectRoot(pc)} />
-  </section>
 
   <!-- As abas ficam no topo do painel (no site ficam abaixo da grade): presas à grade,
        fica claro que elas filtram as escalas mostradas. -->

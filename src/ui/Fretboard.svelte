@@ -2,7 +2,7 @@
   // Só desenha. As células já chegam calculadas pelo estado (theory/); aqui só viram SVG.
   // As cores da madeira, trastes e marcações vêm de variáveis CSS do tema (app.css):
   // claro = rosewood com marcações prateadas, escuro = maple com marcações escuras.
-  import { FRET_COUNT } from '../theory/fretboard';
+  import { FRET_COUNT, type Position } from '../theory/fretboard';
   import type { AnchoredCell } from '../theory/shapes';
   import { anchorColor } from './anchorColors';
   import { type Accidental, noteName } from '../theory/notes';
@@ -35,8 +35,10 @@
     leftHanded: boolean;
     /** Vertical com 2+ âncoras: cada nota é pintada com a(s) cor(es) das âncoras a que pertence. */
     multiAnchor: boolean;
+    /** Posição da nota que está soando agora (anel em volta dela), ou null. */
+    highlight: Position | null;
   }
-  let { cells, stringLabels, accidental, leftHanded, multiAnchor }: Props = $props();
+  let { cells, stringLabels, accidental, leftHanded, multiAnchor, highlight }: Props = $props();
 
   /** Sombra das cordas na madeira. Desligada em teste; para voltar, troque para true. */
   const SHOW_STRING_SHADOW = false;
@@ -128,6 +130,11 @@
       </g>
     {/if}
   {/each}
+
+  {#if highlight}
+    {@const p = pointOf(highlight, leftHanded)}
+    <circle class="now-playing" cx={p.x} cy={p.y} r={NOTE_RADIUS + 4} />
+  {/if}
 </svg>
 
 <style>
@@ -208,6 +215,11 @@
   .note.root text {
     fill: var(--root-note-text);
     font-weight: 800;
+  }
+  .now-playing {
+    fill: none;
+    stroke: var(--playing);
+    stroke-width: 3;
   }
   .anchored .ring {
     fill: none;

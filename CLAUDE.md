@@ -88,15 +88,16 @@ tests/
 
 ## Escopo da v1
 
-### Layout (de cima para baixo, igual ao site)
+### Layout (de cima para baixo; baseado no site, com a tônica acima do braço)
 1. Cabeçalho: "{Tônica} {Escala}", botão de som e a fórmula embaixo (ex.: `1, 2, 3, 5, 6`).
 2. Botões **Settings** (esquerda) e **Tunings** (direita).
-3. Linha de casas 0–24: texto simples no modo Full; **botões** no Vertical e no Diagonal.
-4. Braço: rótulos das cordas à esquerda, notas da casa 0 à esquerda do nut, marcações em
+3. Painel "Tônica": as 12 tônicas como teclas de piano (C, C#, D... ou com bemóis). (No site fica
+   abaixo da tablatura; aqui fica perto do braço, por ser o controle mais trocado durante o estudo.)
+4. Linha de casas 0–24: texto simples no modo Full; **botões** no Vertical e no Diagonal.
+5. Braço: rótulos das cordas à esquerda, notas da casa 0 à esquerda do nut, marcações em
    3, 5, 7, 9, 12 (dupla), 15, 17, 19, 21, 24 (dupla).
-5. Botões de modo: **Full / Vertical / Diagonal**.
-6. Tablatura (só no Vertical e no Diagonal).
-7. Painel "Tônica": as 12 tônicas como teclas de piano (C, C#, D... ou com bemóis).
+6. Botões de modo: **Full / Vertical / Diagonal**.
+7. Tablatura (só no Vertical e no Diagonal).
 8. Painel "Escala": abas de categoria **Common / Rare / Exotic** (com contagem) no topo e a grade de
    escalas da categoria atual abaixo. (No site as abas ficam abaixo da grade; aqui ficam presas a ela,
    para deixar claro que filtram a grade.)
@@ -321,3 +322,7 @@ Sincronizado com a query string para links compartilháveis, por exemplo:
   vieram do catálogo embutido no `app.js` do site (mesma fonte da linha "Formula:" das páginas; uma
   amostra de 12 páginas foi conferida). Altered: o site tem semitons errados para a própria fórmula;
   seguimos a fórmula. As outras 53 escalas da lista ficam para depois.
+- Som (`src/audio/player.ts`): "pluck" sintetizado com Web Audio (dente-de-serra + passa-baixa que
+  fecha + decaimento). Vertical/Diagonal tocam a sequência da tablatura (uma frase por âncora);
+  o Full toca a escala numa oitava a partir da tônica mais grave (`theory/playback.ts`). A nota que
+  soa é destacada no braço. Qualquer mudança no estado para o som.
