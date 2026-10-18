@@ -19,6 +19,15 @@
   --button: #ebe8e3;
   --border: #c9c4bc;
   --window: #fde9b8;
+  /* Painéis (Tônica, Escala) e chips de escala. */
+  --surface: #ffffff;
+  --chip: #f1eee9;
+  /* Teclas da tônica: naturais claras, com acidente escuras. */
+  --key-natural: #fbfaf7;
+  --key-natural-text: #222;
+  --key-border: #c9c4bc;
+  --key-sharp: #3a3632;
+  --key-sharp-text: #f1ede6;
 
   --wood-edge: #24170f;
   --wood-center: #46301f;
@@ -68,6 +77,13 @@
   --button: #2b2a28;
   --border: #48443f;
   --window: #4b3b16;
+  --surface: #212123;
+  --chip: #2c2b2e;
+  --key-natural: #d9d4cc;
+  --key-natural-text: #1d1d1d;
+  --key-border: #8f8a82;
+  --key-sharp: #0f0f10;
+  --key-sharp-text: #d9d4cc;
 
   --wood-edge: #c49c5f;
   --wood-center: #ecd3a0;

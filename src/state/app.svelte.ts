@@ -68,6 +68,12 @@ class AppState {
   title = $derived(`${noteName(this.root, this.accidental)} ${this.scale.name}`);
   stringLabels = $derived(tuningNoteNames(this.tuning, this.accidental));
   visibleScales = $derived(scalesInCategory(this.category));
+  /** Quantas escalas há em cada categoria (mostrado nas abas). */
+  categoryCounts = {
+    common: scalesInCategory('common').length,
+    rare: scalesInCategory('rare').length,
+    exotic: scalesInCategory('exotic').length,
+  };
 
   /** Formas do modo atual: uma por âncora no Vertical, uma só no Diagonal, nenhuma no Full. */
   shapes = $derived.by<Shape[]>(() => {

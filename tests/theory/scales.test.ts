@@ -93,10 +93,47 @@ describe('catálogo', () => {
     }
   });
 
-  it('filtra por categoria', () => {
-    expect(scalesInCategory('common').map((s) => s.id)).toEqual(['major', 'pentatonic-major']);
-    expect(scalesInCategory('rare').map((s) => s.id)).toEqual(['overtone-dominant']);
-    expect(scalesInCategory('exotic').map((s) => s.id)).toEqual(['algerian']);
+  it('tem 55 escalas: 24 Common, 18 Rare (13 + 5 de blues), 13 Exotic', () => {
+    expect(SCALES).toHaveLength(55);
+    expect(scalesInCategory('common')).toHaveLength(24);
+    expect(scalesInCategory('rare')).toHaveLength(18);
+    expect(scalesInCategory('exotic')).toHaveLength(13);
+  });
+
+  it('filtra por categoria mantendo a ordem do site', () => {
+    expect(scalesInCategory('common').slice(0, 4).map((s) => s.id)).toEqual([
+      'major', 'harmonic-minor', 'melodic-minor', 'natural-minor',
+    ]);
+    expect(scalesInCategory('exotic')[0].id).toBe('algerian');
+  });
+
+  // Conferência musical independente do site: escalas conhecidas, em semitons.
+  it.each([
+    ['harmonic-minor', [0, 2, 3, 5, 7, 8, 11]],
+    ['dorian', [0, 2, 3, 5, 7, 9, 10]],
+    ['pentatonic-minor', [0, 3, 5, 7, 10]],
+    ['blues', [0, 3, 5, 6, 7, 10]],
+    ['altered', [0, 1, 3, 4, 6, 8, 10]], // a fórmula do site; os semitons do site estão errados
+    ['phrygian-major', [0, 1, 4, 5, 7, 8, 10]],
+    ['hirajoshi', [0, 2, 3, 7, 8]],
+    ['chromatic', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+  ])('%s', (id, semitones) => {
+    expect(formulaToSemitones(scale(id).formula)).toEqual(semitones);
+  });
+
+  it('inclui todas as escalas de blues do site', () => {
+    const blues = SCALES.filter((s) => /blues/i.test(s.name)).map((s) => s.id);
+    expect(blues).toEqual([
+      'pentatonic-blues', 'auxiliary-diminished-blues', 'blues', 'blues-1', 'blues-2', 'blues-3',
+      'major-blues-scale', 'mixo-blues',
+    ]);
+  });
+
+  it('as 4 fórmulas confirmadas no CLAUDE.md continuam iguais', () => {
+    expect(scale('pentatonic-major').formula.join(',')).toBe('1,2,3,5,6');
+    expect(scale('major').formula.join(',')).toBe('1,2,3,4,5,6,7');
+    expect(scale('overtone-dominant').formula.join(',')).toBe('1,2,3,#4,5,6,b7');
+    expect(scale('algerian').formula.join(',')).toBe('1,2,b3,4,#4,5,b6,7');
   });
 
   it('findScale retorna undefined para id desconhecido', () => {

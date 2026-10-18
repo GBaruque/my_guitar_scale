@@ -96,9 +96,10 @@ tests/
    3, 5, 7, 9, 12 (dupla), 15, 17, 19, 21, 24 (dupla).
 5. Botões de modo: **Full / Vertical / Diagonal**.
 6. Tablatura (só no Vertical e no Diagonal).
-7. Fileira das 12 tônicas (C, C#, D... ou com bemóis, conforme a configuração).
-8. Grade de escalas da categoria atual.
-9. Abas de categoria: **Common / Rare / Exotic**.
+7. Painel "Tônica": as 12 tônicas como teclas de piano (C, C#, D... ou com bemóis).
+8. Painel "Escala": abas de categoria **Common / Rare / Exotic** (com contagem) no topo e a grade de
+   escalas da categoria atual abaixo. (No site as abas ficam abaixo da grade; aqui ficam presas a ela,
+   para deixar claro que filtram a grade.)
 
 ### Círculos das notas
 - Mostram o nome da nota. Tônica em laranja, demais notas em amarelo (modo com 1 âncora).
@@ -315,3 +316,8 @@ Sincronizado com a query string para links compartilháveis, por exemplo:
   A categoria visível não vai na URL: ao abrir um link, ela começa na categoria da escala.
 - Seleção do Diagonal pela ponta mais próxima, em vez de "≤ 12 move o início". A regra original
   impedia escolher, por exemplo, 0–10 (clicar no 10 movia o início) ou um início depois da casa 12.
+- Marco 10 reduzido a 55 escalas (24 Common + 13 Rare + 13 Exotic, as mais conhecidas, mais as 5
+  escalas de blues restantes, todas Rare). As fórmulas
+  vieram do catálogo embutido no `app.js` do site (mesma fonte da linha "Formula:" das páginas; uma
+  amostra de 12 páginas foi conferida). Altered: o site tem semitons errados para a própria fórmula;
+  seguimos a fórmula. As outras 53 escalas da lista ficam para depois.

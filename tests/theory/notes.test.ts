@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   allPitchClasses,
   intervalUp,
+  isNatural,
   mod,
   noteName,
   parseNoteName,
@@ -58,6 +59,15 @@ describe('noteName', () => {
     expect(allPitchClasses().map((pc) => noteName(pc))).toEqual([
       'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
     ]);
+  });
+});
+
+describe('isNatural', () => {
+  it('7 naturais e 5 com acidente, como as teclas do piano', () => {
+    expect(allPitchClasses().filter(isNatural).map((pc) => noteName(pc))).toEqual([
+      'C', 'D', 'E', 'F', 'G', 'A', 'B',
+    ]);
+    expect(isNatural(13)).toBe(false); // C# uma oitava acima
   });
 });
 

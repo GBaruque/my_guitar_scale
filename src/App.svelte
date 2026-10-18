@@ -82,9 +82,18 @@
     <Tablature tabs={app.tabs} labels={tabLabels} />
   {/if}
 
-  <RootPicker root={app.root} accidental={app.accidental} onSelect={(pc) => app.selectRoot(pc)} />
-  <ScaleGrid scales={app.visibleScales} selectedId={app.scaleId} onSelect={(id) => app.selectScale(id)} />
-  <CategoryTabs category={app.category} onSelect={(c) => app.selectCategory(c)} />
+  <section class="panel" aria-labelledby="root-title">
+    <h2 id="root-title" class="panel-title">Tônica</h2>
+    <RootPicker root={app.root} accidental={app.accidental} onSelect={(pc) => app.selectRoot(pc)} />
+  </section>
+
+  <!-- As abas ficam no topo do painel (no site ficam abaixo da grade): presas à grade,
+       fica claro que elas filtram as escalas mostradas. -->
+  <section class="panel" aria-labelledby="scale-title">
+    <h2 id="scale-title" class="panel-title">Escala</h2>
+    <CategoryTabs category={app.category} counts={app.categoryCounts} onSelect={(c) => app.selectCategory(c)} />
+    <ScaleGrid scales={app.visibleScales} selectedId={app.scaleId} onSelect={(id) => app.selectScale(id)} />
+  </section>
 </main>
 
 <style>
@@ -95,6 +104,20 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+  }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem 1rem;
+  }
+  .panel-title {
+    margin: 0 0 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
   .toolbar {
     display: flex;

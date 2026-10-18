@@ -52,6 +52,14 @@ export function noteName(pc: PitchClass, accidental: Accidental = 'sharp'): stri
   return names[mod(pc, SEMITONES_PER_OCTAVE)];
 }
 
+/**
+ * Nota natural (sem acidente: C, D, E, F, G, A, B), as "teclas brancas" do piano.
+ * As outras cinco são as que levam # ou b no nome (as "teclas pretas").
+ */
+export function isNatural(pc: PitchClass): boolean {
+  return Object.values(NATURAL_PITCH).includes(mod(pc, SEMITONES_PER_OCTAVE));
+}
+
 /** As 12 tônicas na ordem de exibição (C, C#, D...). */
 export function allPitchClasses(): PitchClass[] {
   return Array.from({ length: SEMITONES_PER_OCTAVE }, (_, i) => i);

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { midiAt } from '../../../src/theory/fretboard';
 import { windowBounds, windowStrategy } from '../../../src/theory/fingering/window';
 import { pitchClassOf } from '../../../src/theory/notes';
-import { scalePitchClasses } from '../../../src/theory/scales';
+import { SCALES, scalePitchClasses } from '../../../src/theory/scales';
 import { MAX_ANCHOR, verticalRegion } from '../../../src/theory/shapes';
 import { TUNINGS } from '../../../src/theory/tunings';
 import { fretsByString, scale, tuning } from '../../helpers';
@@ -78,7 +78,7 @@ describe('Diagonal: caso de referência (nossa estratégia)', () => {
 });
 
 describe('propriedades em todas as afinações e âncoras', () => {
-  const scaleIds = ['major', 'pentatonic-major', 'overtone-dominant', 'algerian'];
+  const scaleIds = SCALES.map((s) => s.id);
 
   it.each(TUNINGS.map((t) => [t.id]))('%s: sequência sem buracos e dentro da janela', (tuningId) => {
     const t = tuning(tuningId);
