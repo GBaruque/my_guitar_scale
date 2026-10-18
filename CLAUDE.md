@@ -317,11 +317,10 @@ Sincronizado com a query string para links compartilháveis, por exemplo:
   A categoria visível não vai na URL: ao abrir um link, ela começa na categoria da escala.
 - Seleção do Diagonal pela ponta mais próxima, em vez de "≤ 12 move o início". A regra original
   impedia escolher, por exemplo, 0–10 (clicar no 10 movia o início) ou um início depois da casa 12.
-- Marco 10 reduzido a 55 escalas (24 Common + 13 Rare + 13 Exotic, as mais conhecidas, mais as 5
-  escalas de blues restantes, todas Rare). As fórmulas
-  vieram do catálogo embutido no `app.js` do site (mesma fonte da linha "Formula:" das páginas; uma
-  amostra de 12 páginas foi conferida). Altered: o site tem semitons errados para a própria fórmula;
-  seguimos a fórmula. As outras 53 escalas da lista ficam para depois.
+- Catálogo completo (108 escalas). As fórmulas vieram do catálogo embutido no `app.js` do site (mesma
+  fonte da linha "Formula:" das páginas; uma amostra de 16 páginas foi conferida). Altered: o site tem
+  semitons errados para a própria fórmula; seguimos a fórmula. A entrada "Natural (Pure) Minor" do
+  site (categoria escondida, cópia da Natural Minor) não entra.
 - Som (`src/audio/player.ts`): "pluck" sintetizado com Web Audio (dente-de-serra + passa-baixa que
   fecha + decaimento). Vertical/Diagonal tocam a sequência da tablatura (uma frase por âncora);
   o Full toca a escala numa oitava a partir da tônica mais grave (`theory/playback.ts`). A nota que

@@ -93,11 +93,11 @@ describe('catálogo', () => {
     }
   });
 
-  it('tem 55 escalas: 24 Common, 18 Rare (13 + 5 de blues), 13 Exotic', () => {
-    expect(SCALES).toHaveLength(55);
+  it('tem as 108 escalas do CLAUDE.md: 24 Common, 36 Rare, 48 Exotic', () => {
+    expect(SCALES).toHaveLength(108);
     expect(scalesInCategory('common')).toHaveLength(24);
-    expect(scalesInCategory('rare')).toHaveLength(18);
-    expect(scalesInCategory('exotic')).toHaveLength(13);
+    expect(scalesInCategory('rare')).toHaveLength(36);
+    expect(scalesInCategory('exotic')).toHaveLength(48);
   });
 
   it('filtra por categoria mantendo a ordem do site', () => {
@@ -117,6 +117,9 @@ describe('catálogo', () => {
     ['phrygian-major', [0, 1, 4, 5, 7, 8, 10]],
     ['hirajoshi', [0, 2, 3, 7, 8]],
     ['chromatic', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]],
+    ['whole-tone', [0, 2, 4, 6, 8, 10]],
+    ['octatonic-h-w', [0, 1, 3, 4, 6, 7, 9, 10]],
+    ['super-locrian', [0, 1, 3, 4, 6, 8, 10]], // mesma escala que a Altered, outra grafia
   ])('%s', (id, semitones) => {
     expect(formulaToSemitones(scale(id).formula)).toEqual(semitones);
   });
